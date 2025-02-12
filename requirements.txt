@@ -9,4 +9,4 @@ alpha_vantage
 yfinance 
 fetch_data
 seaborn
-CurrencyRates
+forex_python
