@@ -196,7 +196,7 @@ def plot_candlestick_2(symbol, filters):
 
     # Mise en forme
     fig.update_layout(
-        height=800,
+        height=600,
         xaxis_title="Date",
         yaxis_title="Prix",
         showlegend=True
