@@ -52,7 +52,7 @@ def plot_candlestick(symbol):
 
     # Mise en forme
     fig.update_layout(
-        height=800,  # Augmente la hauteur globale du graphique
+        height=500,  # Augmente la hauteur globale du graphique
         xaxis_title="Date",
         yaxis_title="Prix",
         showlegend=False
@@ -61,6 +61,53 @@ def plot_candlestick(symbol):
 
     # Affichage avec Streamlit
     st.plotly_chart(fig)
+    
+def plot_comparison():
+    """Affiche l'évolution des prix normalisés des 3 actifs avec des étiquettes"""
+    # Chargement des données
+    df_sp500 = pd.read_csv("data/SP500.csv", index_col=0, parse_dates=True)
+    df_btc = pd.read_csv("data/BTC.csv", index_col=0, parse_dates=True)
+    df_gold = pd.read_csv("data/GOLD.csv", index_col=0, parse_dates=True)
+
+    # Normalisation des prix pour une comparaison claire
+    df_sp500["Normalized"] = df_sp500["Close"] / df_sp500["Close"].iloc[0]
+    df_btc["Normalized"] = df_btc["Close"] / df_btc["Close"].iloc[0]
+    df_gold["Normalized"] = df_gold["Close"] / df_gold["Close"].iloc[0]
+
+    # Création du graphique
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=df_sp500.index, y=df_sp500["Normalized"], mode="lines",
+                             name="S&P 500", line=dict(color="gold")))
+    fig.add_trace(go.Scatter(x=df_btc.index, y=df_btc["Normalized"], mode="lines",
+                             name="BTC", line=dict(color="green")))
+    fig.add_trace(go.Scatter(x=df_gold.index, y=df_gold["Normalized"], mode="lines",
+                             name="GOLD", line=dict(color="blue")))
+
+    # Ajout des étiquettes finales sur la dernière valeur de chaque actif
+    last_date = df_sp500.index[-1]
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_sp500["Normalized"].iloc[-1]],
+                             text=["SNP500"], mode="text",
+                             textposition="middle right", textfont=dict(color="gold", size=14)))
+
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_btc["Normalized"].iloc[-1]],
+                             text=["BTC"], mode="text",
+                             textposition="middle right", textfont=dict(color="green", size=14)))
+
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_gold["Normalized"].iloc[-1]],
+                             text=["GOLD"], mode="text",
+                             textposition="middle right", textfont=dict(color="blue", size=14)))
+
+    # Mise en forme
+    fig.update_layout(title="Comparaison de l'évolution des prix (Normalisés)",
+                      xaxis_title="Date",
+                      yaxis_title="Prix normalisé",
+                      template="plotly_white",
+                      showlegend=False)
+
+    # Affichage avec Streamlit
+    st.plotly_chart(fig)
+    
     
 #================================================ DETAILS =====================================================#
 
