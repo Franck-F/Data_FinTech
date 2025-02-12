@@ -30,7 +30,7 @@ st.set_page_config(page_title="Analyse Financière", layout="wide")
 # Mise en page du titre
 st.markdown(
     """
-    <h1 style='text-align: center; font-family: Arial, sans-serif; font-weight: bold;'>
+    <h1 style='text-align: center; font-family: Signika, sans-serif; font-weight: bold;'>
         Dashboard financier 📈
     </h1>
     """, unsafe_allow_html=True
@@ -86,13 +86,15 @@ with tab_details:
     # 🏹 Prédiction des Prix
     st.subheader("🏹 Prédiction des Prix (30 jours)")
     plot_forecast(actif)
-
-with tab_comparison:
-# 📊 Distribution des Rendements
+    
+    # 📊 Distribution des Rendements
     st.subheader("📊 Distribution des Rendements Quotidiens")
     plot_return_distribution(actif)
 
     # 📈 Graphique d'Évolution des Prix avec Moyenne Mobile
     st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
     plot_price_trends(actif)
+
+with tab_comparison:
+
 
