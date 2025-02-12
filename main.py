@@ -6,22 +6,19 @@ import plotly.graph_objects as go
 import plotly.subplots as sp
 from data_fetcher import fetch_data
 from alerts import plot_trends  # Correction ici !
-from stats_analysis import plot_daily_returns, plot_volatility  # Ajout ici
+from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility  # Ajout ici
 from correlation import plot_correlation_matrix
 from predictor import plot_forecast
 from indicators import plot_rsi
 from visualization import plot_price_trends
 from predictor import plot_forecast
 from indicators import plot_rsi
-from visualization import plot_price_trends
+from visualization import plot_price_trends, plot_comparison, plot_candlestick_2
 from indicators import plot_bollinger_bands, plot_macd
 from stats_analysis import plot_return_distribution
 from visualization import plot_candlestick
 from stats_analysis import plot_daily_returns
-from stats_analysis import plot_volatility
 from indicators import plot_rsi
-
-
 
 
 # 🌟 Interface Streamlit
@@ -38,7 +35,7 @@ st.markdown(
  
 col_1, col_2 = st.columns([2, 1])
 with col_1: 
-    st.title("📊 Analyse des Actifs")
+    st.subheader("📊 Analyse des Actifs")
 with col_2:
     st.button("Analyse")
     st.button("Rapport")
@@ -62,7 +59,10 @@ with tab_overview:
     plot_candlestick(actif)
 
 with tab_details:
-       
+    # 📊 Analyse des Indicateurs
+    st.subheader("📈 Evolution des prix des actifs")
+    plot_candlestick_2(actif, filters)  
+     
     # 🛑 RSI (Indicateur Technique)
     st.subheader("🛑 Indicateur Technique : RSI")
     plot_rsi(actif)
@@ -76,25 +76,38 @@ with tab_details:
     plot_macd(actif)
     
     # 📉 Rendements Quotidiens
-    st.subheader("📉 Rendements Quotidiens")
-    plot_daily_returns(actif)
+    #st.subheader("📉 Rendements Quotidiens")
+    #plot_daily_returns(actif)
 
     # 📊 Volatilité Annuelle
-    st.subheader("📊 Volatilité Annuelle")
-    plot_volatility()
-
-    # 🏹 Prédiction des Prix
-    st.subheader("🏹 Prédiction des Prix (30 jours)")
-    plot_forecast(actif)
+    #st.subheader("📊 Volatilité Annuelle")
+    #plot_volatility()
     
     # 📊 Distribution des Rendements
-    st.subheader("📊 Distribution des Rendements Quotidiens")
-    plot_return_distribution(actif)
+    #st.subheader("📊 Distribution des Rendements Quotidiens")
+    #plot_return_distribution(actif)
 
     # 📈 Graphique d'Évolution des Prix avec Moyenne Mobile
     st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
     plot_price_trends(actif)
+    
+    # 📊 Distribution des Rendements
+    st.subheader("📊 Distribution des Rendements Quotidiens")
+    plot_return_distribution(actif)
+    
+    # 📊 Volatilité Annuelle
+    st.subheader("📊 Volatilité Annuelle")
+    plot_volatility()
+    
+     # 📉 Rendements Quotidiens
+    st.subheader("📉 Rendements Quotidiens")
+    plot_daily_returns(actif)
+        
+    # 🏹 Prédiction des Prix
+    st.subheader("🏹 Prédiction des Prix (30 jours)")
+    plot_forecast(actif)
 
 with tab_comparison:
-
-
+    # 📊 Comparaison des Actifs
+    st.subheader("comparaison des actifs ")
+    plot_comparison()
