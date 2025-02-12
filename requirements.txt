@@ -8,3 +8,4 @@ backtrader
 alpha_vantage
 yfinance 
 fetch_data
+seaborn
