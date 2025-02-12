@@ -49,7 +49,7 @@ st.set_page_config(page_title="Analyse Financière", layout="wide")
 st.markdown(
     """
     <h1 style='text-align: center; font-family: Signika, sans-serif; font-weight: bold;'>
-        Dashboard financier 📈
+        Tableau de bord financier 📈
     </h1>
     """, unsafe_allow_html=True
 )
