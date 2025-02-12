@@ -130,7 +130,7 @@ with tab_details:
 
 with tab_comparison:
     # 📊 Comparaison des Actifs
-    st.subheader("comparaison des actifs ")
+    st.subheader("Comparaison des actifs ")
     plot_comparison()
 
 with tab_risques:
