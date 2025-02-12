@@ -1,7 +1,10 @@
 streamlit
 requests
 pandas
+numpy
 plotly
 prophet
 backtrader
 alpha_vantage
+yfinance 
+fetch_data
