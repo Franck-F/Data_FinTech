@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import plotly.subplots as sp
 from data_fetcher import fetch_data
 from alerts import plot_trends  # Correction ici !
-from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility  # Ajout ici
+from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility, plot_drawdown, compute_var  # Ajout ici
 from correlation import plot_correlation_matrix
 from predictor import plot_forecast
 from forex_python.converter import CurrencyRates
@@ -84,7 +84,7 @@ with col2:
 filters = st.multiselect("Sélectionnez les filtres à appliquer :", ["RSI", "MACD", "Rendement", "SMA", "EMA"])
 
 # --- Section Overview ---
-tab_overview, tab_details, tab_comparison = st.tabs(["Overview", "Details", "Comparaison"])
+tab_overview, tab_details, tab_comparison, tab_risques = st.tabs(["Overview", "Details", "Comparaison", "Risques"])
 
 with tab_overview:  
     # 📈 Graphique en Chandeliers
@@ -132,4 +132,15 @@ with tab_comparison:
     # 📊 Comparaison des Actifs
     st.subheader("comparaison des actifs ")
     plot_comparison()
+
+with tab_risques:
+    # 🚨 Risques associés aux actifs
+    st.markdown(
+    "<h1 style='text-align: center;'>📊 Analyse des Risques Financiers</h1>", 
+    unsafe_allow_html=True)
+    # 📉 VaR
+    compute_var(actif)
+
+    # 📉 Drawdown
+    plot_drawdown(actif)
     
