@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 def compute_financial_metrics(symbol):
@@ -31,38 +32,37 @@ def compute_financial_metrics(symbol):
     print(f"📉 Volatilité Annuelle : {annual_volatility:.2%}")
     print(f"⚖ Sharpe Ratio : {sharpe_ratio:.2f}")
     print(f"📊 Sortino Ratio : {sortino_ratio:.2f}")
-
 def plot_return_distribution(symbol):
-    """Affiche la distribution des rendements quotidiens"""
+    """Affiche la distribution des rendements quotidiens avec un histogramme interactif."""
     df = pd.read_csv(f"data/{symbol}.csv", index_col=0, parse_dates=True)
-    df["Daily_Return"] = df["Close"].pct_change()
+    df["Daily_Return"] = df["Close"].pct_change().dropna()
 
-    # Création du graphique
-    fig, ax = plt.subplots(figsize=(8, 5))
-    sns.histplot(df["Daily_Return"].dropna(), bins=50, kde=True, ax=ax)
-    ax.set_title(f"Distribution des Rendements Quotidiens ({symbol})")
-    ax.set_xlabel("Rendement")
-    ax.set_ylabel("Fréquence")
-
-    # Affichage avec Streamlit
-    st.pyplot(fig)
+    fig = px.histogram(df, x="Daily_Return", nbins=50, 
+                       title=f"Distribution des Rendements Quotidiens ({symbol})",
+                       labels={"Daily_Return": "Rendement"},
+                       marginal="box", opacity=0.75)
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 def plot_daily_returns(symbol):
-    """Affiche les rendements quotidiens sous forme de courbe"""
+    """Affiche les rendements quotidiens sous forme de courbe interactive."""
     df = pd.read_csv(f"data/{symbol}.csv", index_col=0, parse_dates=True)
-    df["Daily_Return"] = df["Close"].pct_change()
+    df["Daily_Return"] = df["Close"].pct_change().dropna()
 
-    # Création du graphique
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(df.index, df["Daily_Return"], label=f"Rendements {symbol}", color="blue")
-    ax.axhline(0, color='black', linestyle='--')
-    ax.set_title(f"Rendements Quotidiens de {symbol}")
-    ax.legend()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df.index, y=df["Daily_Return"], 
+                             mode='lines', name=f"Rendements {symbol}",
+                             line=dict(color="blue")))
+    
+    fig.update_layout(title=f"Rendements Quotidiens de {symbol}",
+                      xaxis_title="Date",
+                      yaxis_title="Rendement",
+                      hovermode="x unified")
+    
+    st.plotly_chart(fig, use_container_width=True)
 
-    # Affichage avec Streamlit
-    st.pyplot(fig)
 def plot_volatility():
-    """Affiche la volatilité annuelle des actifs"""
+    """Affiche la volatilité annuelle des actifs sous forme de graphique interactif."""
     assets = ["BTC", "SP500", "GOLD"]
     volatilities = []
 
@@ -72,15 +72,14 @@ def plot_volatility():
         annual_volatility = daily_volatility * np.sqrt(252)
         volatilities.append(annual_volatility)
 
-    # Création du graphique
     df_vol = pd.DataFrame({"Actifs": assets, "Volatilité Annuelle": volatilities})
-    fig, ax = plt.subplots(figsize=(8,5))
-    sns.barplot(x="Actifs", y="Volatilité Annuelle", data=df_vol, ax=ax)
-    ax.set_title("Comparaison de la Volatilité Annuelle")
-    ax.set_ylabel("Volatilité (%)")
 
-    # Affichage avec Streamlit
-    st.pyplot(fig)
+    fig = px.bar(df_vol, x="Actifs", y="Volatilité Annuelle", 
+                 title="Comparaison de la Volatilité Annuelle",
+                 color="Actifs", text_auto='.2%',
+                 labels={"Volatilité Annuelle": "Volatilité (%)"})
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     print("⚠ Ce script est conçu pour être utilisé avec Streamlit.")
