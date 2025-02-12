@@ -63,7 +63,7 @@ def plot_candlestick(symbol):
     st.plotly_chart(fig)
     
 def plot_comparison():
-    """Affiche l'évolution des prix normalisés des 3 actifs avec des étiquettes"""
+    """Affiche l'évolution des prix normalisés des 3 actifs avec échelle logarithmique"""
     # Chargement des données
     df_sp500 = pd.read_csv("data/SP500.csv", index_col=0, parse_dates=True)
     df_btc = pd.read_csv("data/BTC.csv", index_col=0, parse_dates=True)
@@ -74,40 +74,46 @@ def plot_comparison():
     df_btc["Normalized"] = df_btc["Close"] / df_btc["Close"].iloc[0]
     df_gold["Normalized"] = df_gold["Close"] / df_gold["Close"].iloc[0]
 
+    # Transformation logarithmique
+    df_sp500["Log_Normalized"] = np.log(df_sp500["Normalized"])
+    df_btc["Log_Normalized"] = np.log(df_btc["Normalized"])
+    df_gold["Log_Normalized"] = np.log(df_gold["Normalized"])
+
     # Création du graphique
     fig = go.Figure()
 
-    fig.add_trace(go.Scatter(x=df_sp500.index, y=df_sp500["Normalized"], mode="lines",
+    fig.add_trace(go.Scatter(x=df_sp500.index, y=df_sp500["Log_Normalized"], mode="lines",
                              name="S&P 500", line=dict(color="gold")))
-    fig.add_trace(go.Scatter(x=df_btc.index, y=df_btc["Normalized"], mode="lines",
+    fig.add_trace(go.Scatter(x=df_btc.index, y=df_btc["Log_Normalized"], mode="lines",
                              name="BTC", line=dict(color="green")))
-    fig.add_trace(go.Scatter(x=df_gold.index, y=df_gold["Normalized"], mode="lines",
+    fig.add_trace(go.Scatter(x=df_gold.index, y=df_gold["Log_Normalized"], mode="lines",
                              name="GOLD", line=dict(color="blue")))
 
     # Ajout des étiquettes finales sur la dernière valeur de chaque actif
     last_date = df_sp500.index[-1]
-    fig.add_trace(go.Scatter(x=[last_date], y=[df_sp500["Normalized"].iloc[-1]],
-                             text=["SNP500"], mode="text",
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_sp500["Log_Normalized"].iloc[-1]],
+                             text=["S&P 500"], mode="text",
                              textposition="middle right", textfont=dict(color="gold", size=14)))
 
-    fig.add_trace(go.Scatter(x=[last_date], y=[df_btc["Normalized"].iloc[-1]],
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_btc["Log_Normalized"].iloc[-1]],
                              text=["BTC"], mode="text",
                              textposition="middle right", textfont=dict(color="green", size=14)))
 
-    fig.add_trace(go.Scatter(x=[last_date], y=[df_gold["Normalized"].iloc[-1]],
+    fig.add_trace(go.Scatter(x=[last_date], y=[df_gold["Log_Normalized"].iloc[-1]],
                              text=["GOLD"], mode="text",
                              textposition="middle right", textfont=dict(color="blue", size=14)))
 
     # Mise en forme
-    fig.update_layout(title="Comparaison de l'évolution des prix (Normalisés)",
-                      xaxis_title="Date",
-                      yaxis_title="Prix normalisé",
-                      template="plotly_white",
-                      showlegend=False)
+    fig.update_layout(
+        title="Comparaison de l'évolution des prix (Logarithmique)",
+        xaxis_title="Date",
+        yaxis_title="Log(Prix normalisé)",
+        template="plotly_white",
+        showlegend=False
+    )
 
     # Affichage avec Streamlit
     st.plotly_chart(fig)
-    
     
 #================================================ DETAILS =====================================================#
 
