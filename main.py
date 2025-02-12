@@ -19,6 +19,7 @@ from stats_analysis import plot_return_distribution
 from visualization import plot_candlestick
 from stats_analysis import plot_daily_returns
 from indicators import plot_rsi
+from forex_python.converter import CurrencyRates
 
 # Fonction de conversion avec gestion des erreurs et alternative API
 def convertir_devise(montant, devise_source, devise_cible):
