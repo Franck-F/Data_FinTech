@@ -20,6 +20,25 @@ from visualization import plot_candlestick
 from stats_analysis import plot_daily_returns
 from indicators import plot_rsi
 
+# Fonction de conversion avec gestion des erreurs et alternative API
+def convertir_devise(montant, devise_source, devise_cible):
+    try:
+        # Tentative d'utilisation de forex_python
+        c = CurrencyRates()
+        taux = c.get_rate(devise_source, devise_cible)
+        return montant * taux
+    except Exception as e:
+        # Si forex_python échoue, utiliser une API alternative
+      #st.warning("Erreur avec l'API Forex Python. Tentative d'utilisation d'une autre API.")
+        try:
+            url = f"https://api.exchangerate-api.com/v4/latest/{devise_source}"
+            response = requests.get(url)
+            data = response.json()
+            taux = data['rates'].get(devise_cible, 1)
+            return montant * taux
+        except Exception as e:
+            st.error(f"Erreur API : {e}")
+            return montant  # Retourner le montant initial si tout échoue
 
 # 🌟 Interface Streamlit
 st.set_page_config(page_title="Analyse Financière", layout="wide")
@@ -45,7 +64,20 @@ col1, col2 = st.columns([2, 1])
 with col1:
      actif = st.selectbox("Sélectionnez un actif 🏦", ["BTC", "SP500", "GOLD"])
 with col2:
-    devise = st.selectbox("Sélectionnez la devise 💸", ["USD", "EUR", "GBP"])
+    devise = st.selectbox("Sélectionnez la devise 💱", ["USD", "EUR", "GBP"])
+    prix_usd = 1  # Exemple
+    prix_converti = convertir_devise(prix_usd, "USD", devise)
+ 
+# Définir la couleur en fonction de la devise
+    if devise == "USD":
+      couleur = "orange"
+    elif devise == "EUR":
+     couleur = "blue"
+    else:
+     couleur = "magenta"
+ 
+# Afficher le prix avec la couleur appropriée
+    st.write(f"Prix en <span style='color:{couleur}'>{devise}</span> : <span style='color:{couleur}'>{prix_converti:.2f} {devise}</span>", unsafe_allow_html=True)
 
 # Options de filtres
 filters = st.multiselect("Sélectionnez les filtres à appliquer :", ["RSI", "MACD", "Rendement", "SMA", "EMA"])
