@@ -25,3 +25,4 @@ def compute_ratios(symbol):
         "Rendement Annuel": round(annual_return * 100, 2)
     }
 
+ 
