@@ -342,7 +342,6 @@ def plot_annual_comparison():
 
 
 
-
 if __name__ == "__main__":
     print("⚠ Ce script est conçu pour être utilisé avec Streamlit.")
 
