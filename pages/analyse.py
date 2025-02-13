@@ -132,7 +132,7 @@ plot_forecast(actif)
 st.subheader("Comparaison des actifs")
 st.markdown("Cette section permet de comparer les performances de plusieurs actifs afin d'identifier les plus rentables ou les plus stables.")
 plot_comparison()
-plot_comparison_percentage()
+#plot_comparison_percentage()
     
 # 🚨 Risques associés aux actifs
 st.markdown(
