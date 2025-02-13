@@ -8,10 +8,10 @@ import plotly.graph_objects as go
 import plotly.subplots as sp
 from data_fetcher import fetch_data
 from alerts import plot_trends  # Correction ici !
-from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility, plot_drawdown, compute_var  # Ajout ici
+from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility, plot_drawdown, compute_var, plot_annual_volatility, plot_annual_returns
 from correlation import plot_correlation_matrix
 from predictor import plot_forecast
-from visualization import plot_price_trends, plot_comparison, plot_candlestick_2, plot_comparison_percentage, plot_annual_comparison, plot_candlestick
+from visualization import plot_price_trends, plot_comparison, plot_candlestick_2, plot_comparison_percentage, plot_candlestick
 from indicators import plot_bollinger_bands, plot_macd, plot_rsi
 from analysis import compute_ratios
 from forex_python.converter import CurrencyRates
@@ -138,22 +138,19 @@ with tab_details:
     # 📉 MACD (Moving Average Convergence Divergence)
     st.subheader("📉 MACD")
     plot_macd(actif)
-   
-   #Graphique rendement moyen annuel des actifs
-    st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
-    
-    
+         
     # 📈 Graphique d'Évolution des Prix avec Moyenne Mobile
-    st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
-    plot_price_trends(actif)
-    
-    # 📊 Distribution des Rendements
-    st.subheader("📊 Distribution des Rendements Quotidiens")
-    plot_return_distribution(actif)
+    #st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
+    #plot_price_trends(actif)
     
     # 📊 Volatilité Annuelle
-    st.subheader("📊 Volatilité Total")
-    plot_volatility()
+    st.subheader("📊 Volatilité ")    
+    plot_volatility()    
+    plot_annual_volatility()
+        
+    # 📊 Distribution des Rendements
+    st.subheader("📊 Distribution des Rendements")
+    plot_return_distribution(actif) 
     
      # 📉 Rendements Quotidiens
     st.subheader("📉 Rendements Quotidiens")
@@ -161,15 +158,13 @@ with tab_details:
     
     #Graphique rendement moyen annuel des actifs
     st.subheader("📉 Rendement Moyen Annuel des Actifs")
-    #plot_annual_comparison()
-    
+    plot_annual_returns()
 
 with tab_comparison:
     # 📊 Comparaison des Actifs
     st.subheader("Comparaison des actifs ")
     plot_comparison()
     plot_comparison_percentage()
-    
 
 with tab_risques:
     # 🚨 Risques associés aux actifs
