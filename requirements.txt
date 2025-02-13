@@ -12,3 +12,4 @@ seaborn
 forex_python
 fpdf
 scikit-learn
+pdfkit
