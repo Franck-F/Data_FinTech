@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import plotly.subplots as sp
 from data_fetcher import fetch_data
 from alerts import plot_trends  # Correction ici !
-from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility, plot_drawdown, compute_var  # Ajout ici
+from stats_analysis import plot_daily_returns, plot_return_distribution,plot_annual_volatility, plot_volatility, plot_drawdown, compute_var  # Ajout ici
 from correlation import plot_correlation_matrix
 from visualization import plot_price_trends, plot_comparison, plot_candlestick_2, plot_comparison_percentage
 from visualization import plot_candlestick
@@ -108,6 +108,7 @@ plot_return_distribution(actif)
 st.subheader("🌊 Volatilité Annuelle")
 st.markdown("La volatilité annuelle mesure les fluctuations des prix sur une base annuelle, offrant un aperçu plus approfondi du niveau de risque de l'actif étudié.")
 plot_volatility()
+plot_annual_volatility()
     
 # 📉 Rendements Quotidiens
 st.subheader("📉 Rendements Quotidiens")
@@ -120,6 +121,7 @@ st.markdown(
     """
 )
 plot_daily_returns(actif)
+plot_comparison_percentage()
         
 # 🏉 Prédiction des Prix
 st.subheader("🏉 Prédiction des Prix (30 jours)")
