@@ -1,6 +1,7 @@
 from re import A
 import requests
 import streamlit as st
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -10,9 +11,9 @@ from alerts import plot_trends  # Correction ici !
 from stats_analysis import plot_daily_returns, plot_return_distribution, plot_volatility, plot_drawdown, compute_var  # Ajout ici
 from correlation import plot_correlation_matrix
 from predictor import plot_forecast
-from visualization import plot_price_trends, plot_comparison, plot_candlestick_2, plot_comparison_percentage
+from visualization import plot_price_trends, plot_comparison, plot_candlestick_2, plot_comparison_percentage, plot_annual_comparison, plot_candlestick
 from indicators import plot_bollinger_bands, plot_macd, plot_rsi
-from visualization import plot_candlestick
+from analysis import compute_ratios
 from forex_python.converter import CurrencyRates
 
 
@@ -80,8 +81,6 @@ with col2:
 # Afficher le prix avec la couleur appropriée
     st.write(f"Prix en <span style='color:{couleur}'>{devise}</span> : <span style='color:{couleur}'>{prix_converti:.2f} {devise}</span>", unsafe_allow_html=True)
 
-# Options de filtres
-filters = st.multiselect("Sélectionnez les filtres à appliquer :", ["RSI", "MACD", "Rendement", "SMA", "EMA"])
 
 # --- Section Overview ---
 tab_overview, tab_details, tab_comparison, tab_risques = st.tabs(["Overview", "Details", "Comparaison", "Risques"])
@@ -90,8 +89,40 @@ with tab_overview:
     # 📈 Graphique en Chandeliers
     st.subheader("📈 Evolution des prix des actifs")
     plot_candlestick(actif)
+    # Générer le graphique
+    fig = plot_candlestick(actif)
 
+    # Affichage dans Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+        
+    st.markdown(
+    "<h5 style='text-align: center;'>📊 Ratios de Performance des Actifs</h5>",
+    unsafe_allow_html=True)
+
+    # Récupération des ratios pour chaque actif
+    assets = ["BTC", "SP500", "GOLD"]
+    data = {asset: compute_ratios(asset) for asset in assets}
+
+    # Conversion en DataFrame pour l'affichage
+    df_ratios = pd.DataFrame.from_dict(data, orient="index")
+
+    # Affichage sous forme de tableau interactif
+    st.dataframe(df_ratios)
+
+    # Création de colonnes pour afficher les métriques côte à côte
+    cols = st.columns(len(assets))
+
+    for i, asset in enumerate(assets):
+        with cols[i]:  # Chaque actif dans une colonne séparée
+            st.subheader(f"📌 {asset}")
+            st.metric(label="💹 Rendement Annuel (%)", value=f"{df_ratios.loc[asset, 'Rendement Annuel']}%")
+            st.metric(label="📈 Ratio de Sharpe", value=df_ratios.loc[asset, "Sharpe Ratio"])
+            st.metric(label="📊 Volatilité (%)", value=f"{df_ratios.loc[asset, 'Volatilité']}%")
+    
+    
 with tab_details:
+    # Options de filtres
+    filters = st.multiselect("Appliquer un indicateur technique :", ["RSI", "MACD", "SMA", "EMA"])
     # 📊 Analyse des Indicateurs
     st.subheader("📈 Evolution des prix des actifs")
     plot_candlestick_2(actif, filters)  
@@ -108,6 +139,10 @@ with tab_details:
     st.subheader("📉 MACD")
     plot_macd(actif)
    
+   #Graphique rendement moyen annuel des actifs
+    st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
+    
+    
     # 📈 Graphique d'Évolution des Prix avec Moyenne Mobile
     st.subheader("📉 Évolution des Prix avec Moyenne Mobile")
     plot_price_trends(actif)
@@ -117,16 +152,17 @@ with tab_details:
     plot_return_distribution(actif)
     
     # 📊 Volatilité Annuelle
-    st.subheader("📊 Volatilité Annuelle")
+    st.subheader("📊 Volatilité Total")
     plot_volatility()
     
      # 📉 Rendements Quotidiens
     st.subheader("📉 Rendements Quotidiens")
     plot_daily_returns(actif)
-        
-    # 🏹 Prédiction des Prix
-    st.subheader("🏹 Prédiction des Prix (30 jours)")
-    plot_forecast(actif)
+    
+    #Graphique rendement moyen annuel des actifs
+    st.subheader("📉 Rendement Moyen Annuel des Actifs")
+    plot_annual_comparison()
+    
 
 with tab_comparison:
     # 📊 Comparaison des Actifs
