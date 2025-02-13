@@ -290,6 +290,7 @@ def load_data(file_path):
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
     df['Return'] = df['Close'].pct_change()
     return df
+
 def plot_annual_comparison():
     """Affiche les rendements annuels des actifs (Bitcoin, S&P 500, Or) regroupés par année."""
     # Chargement des données
@@ -325,15 +326,10 @@ def plot_annual_comparison():
     fig.update_layout(
         title="Rendements Moyen Annuels des Actifs",
         xaxis_title="Année",
-        yaxis_title="Rendement Annuel",
+        yaxis_title="Rendement Annuel (%)",
         barmode="group",  # Regroupement des barres
         template="plotly_white",
-        showlegend=True,
-        yaxis=dict(
-            tickmode='array',  # Utiliser un mode d'échelle personnalisé
-            tickvals=[i/1000 for i in range(int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].min().min()*1000), int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].max().max()*1000)+1)],
-            ticktext=[f'{i/1000:.3f}' for i in range(int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].min().min()*1000), int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].max().max()*1000)+1)]
-        )
+        showlegend=True
     )
 
     # Affichage avec Streamlit
@@ -342,6 +338,7 @@ def plot_annual_comparison():
 
 
 
+
 if __name__ == "__main__":
-    print("⚠ Ce script est conçu pour être utilisé avec Streamlit.")
+    print("")
 
