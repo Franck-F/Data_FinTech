@@ -161,7 +161,7 @@ with tab_details:
     
     #Graphique rendement moyen annuel des actifs
     st.subheader("📉 Rendement Moyen Annuel des Actifs")
-    plot_annual_comparison()
+    #plot_annual_comparison()
     
 
 with tab_comparison:
