@@ -285,11 +285,6 @@ def plot_candlestick_2(symbol, filters):
     st.plotly_chart(fig) 
     
 #====================================================fin================================================================
-
-import pandas as pd
-import plotly.graph_objects as go
-import streamlit as st
-
 def load_data(file_path):
     """Charge les données depuis un fichier CSV et calcule les rendements."""
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
