@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 
 def predict_and_plot(asset_data, features, target='Clôture', plot_title='Prédiction des Clôtures'):
     """Fonction de prédiction pour un actif donné et visualisation des résultats"""
