@@ -10,11 +10,18 @@ def compute_ratios(symbol):
 
     df["Returns"] = df["Close"].pct_change()
 
+    # Ratio de Sharpe
     sharpe_ratio = np.mean(df["Returns"]) / np.std(df["Returns"]) * np.sqrt(252)
+
+    # Volatilité annuelle
     volatility = np.std(df["Returns"]) * np.sqrt(252)
 
-    print(f"{symbol} - Sharpe Ratio: {sharpe_ratio:.2f}, Volatilité: {volatility:.2%}")
+    # Rendement annuel moyen
+    annual_return = (1 + df["Returns"].mean())**252 - 1
 
-if __name__ == "__main__":
-    for asset in ["BTC", "SP500", "GOLD"]:
-        compute_ratios(asset)
+    return {
+        "Sharpe Ratio": round(sharpe_ratio, 2),
+        "Volatilité": round(volatility * 100, 2),
+        "Rendement Annuel": round(annual_return * 100, 2)
+    }
+
