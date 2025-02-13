@@ -11,3 +11,4 @@ fetch_data
 seaborn
 forex_python
 fpdf
+scikit-learn
