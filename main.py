@@ -164,7 +164,7 @@ with tab_comparison:
     # 📊 Comparaison des Actifs
     st.subheader("Comparaison des actifs ")
     plot_comparison()
-    plot_comparison_percentage()
+    #plot_comparison_percentage()
 
 with tab_risques:
     # 🚨 Risques associés aux actifs
