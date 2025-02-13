@@ -285,60 +285,11 @@ def plot_candlestick_2(symbol, filters):
     st.plotly_chart(fig) 
     
 #====================================================fin================================================================
-def load_data(file_path):
-    """Charge les données depuis un fichier CSV et calcule les rendements."""
-    df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-    df['Return'] = df['Close'].pct_change()
-    return df
-
-def plot_annual_comparison():
-    """Affiche les rendements annuels des actifs (Bitcoin, S&P 500, Or) regroupés par année."""
-    # Chargement des données
-    df_sp500 = load_data("data/SP500.csv")
-    df_btc = load_data("data/BTC.csv")
-    df_gold = load_data("data/GOLD.csv")
-
-    # Resampling des données pour obtenir les rendements annuels
-    df_sp500_annual = df_sp500['Return'].resample('Y').sum()
-    df_btc_annual = df_btc['Return'].resample('Y').sum()
-    df_gold_annual = df_gold['Return'].resample('Y').sum()
-
-    # Création des années de référence
-    years = df_sp500_annual.index.year
-
-    # Préparer les rendements pour l'affichage
-    df_returns = pd.DataFrame({
-        "Year": years,
-        "S&P 500": df_sp500_annual.values,
-        "Bitcoin": df_btc_annual.values,
-        "Gold": df_gold_annual.values
-    })
-
-    # Création du graphique
-    fig = go.Figure()
-
-    # Ajouter les traces pour chaque actif avec des couleurs dynamiques
-    colors = {"S&P 500": "blue", "Bitcoin": "green", "Gold": "gold"}
-    for asset in df_returns.columns[1:]:
-        fig.add_trace(go.Bar(x=df_returns["Year"], y=df_returns[asset], name=asset, marker_color=colors[asset]))
-
-    # Mise en forme du graphique
-    fig.update_layout(
-        title="Rendements Moyen Annuels des Actifs",
-        xaxis_title="Année",
-        yaxis_title="Rendement Annuel (%)",
-        barmode="group",  # Regroupement des barres
-        template="plotly_white",
-        showlegend=True
-    )
-
-    # Affichage avec Streamlit
-    st.plotly_chart(fig)
 
 
 
 
 
 if __name__ == "__main__":
-    print("")
+    print("⚠ Ce script est conçu pour être utilisé avec Streamlit.")
 
