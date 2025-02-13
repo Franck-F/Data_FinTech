@@ -18,19 +18,18 @@ def plot_price_trends(symbol):
 
     # Affichage avec Streamlit
     st.plotly_chart(fig)
-
 def plot_candlestick(symbol):
-    """Affiche un graphique en chandeliers avec histogramme de volatilité annuelle"""
+    """Affiche un graphique en chandeliers avec histogramme de volatilité annuelle et annotations temporelles"""
     df = pd.read_csv(f"data/{symbol}.csv", index_col=0, parse_dates=True)
 
     # Calcul des rendements journaliers et de la volatilité
     df["Return"] = df["Close"].pct_change()
     df["Volatility"] = df["Return"].rolling(window=30).std() * np.sqrt(252)
 
-    # Création d'un subplot avec deux graphiques, avec une plus grande proportion pour le chandelier
-    fig = sp.make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.4, 
-                           row_heights=[0.85, 0.15], 
-                           subplot_titles=(f"Evolution des prix {symbol}", "Volatilité Annuelle"))
+    # Création d'un subplot avec deux graphiques
+    fig = sp.make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.3, 
+                           row_heights=[6, 3], 
+                           subplot_titles=(f"📈 Evolution des prix {symbol}", "📊 Volatilité Annuelle"))
 
     # Ajout du graphique en chandeliers
     fig.add_trace(go.Candlestick(
@@ -50,14 +49,37 @@ def plot_candlestick(symbol):
         marker_color="red"
     ), row=2, col=1)
 
+    # Ajout d'annotations pour la temporalité
+    annotations = [
+        {"x": "2020-03-15", "text": "📉 Krach COVID", "y": df["Close"].max()},
+        {"x": "2021-11-10", "text": "📈 ATH Bitcoin", "y": df["Close"].max()},
+        {"x": "2022-06-15", "text": "🔻 Bear Market", "y": df["Close"].min()}
+    ]
+
+    for ann in annotations:
+        if ann["x"] in df.index.strftime("%Y-%m-%d").values:  # Vérifie que la date est dans le dataset
+            fig.add_annotation(
+                x=ann["x"],
+                y=ann["y"],
+                text=ann["text"],
+                showarrow=True,
+                arrowhead=2,
+                font=dict(size=12, color="white"),
+                align="center",
+                bgcolor="black",
+                opacity=0.7
+            )
+
     # Mise en forme
     fig.update_layout(
-        height=500,  # Augmente la hauteur globale du graphique
+        height=600,  # Ajustement de la hauteur
         xaxis_title="Date",
         yaxis_title="Prix",
-        showlegend=False
+        showlegend=False,
+        xaxis_rangeslider_visible=False
     )
 
+    return fig
 
     # Affichage avec Streamlit
     st.plotly_chart(fig)
@@ -164,7 +186,7 @@ def plot_comparison_percentage():
     # Affichage avec Streamlit
     st.plotly_chart(fig)
 
-#================================================ DETAILS =====================================================#
+
 
 #=========================fonction de calcul des indicateurs
 
@@ -186,16 +208,17 @@ def calculate_indicators(df, filters):
 
     if "SMA" in filters:
         df["SMA_50"] = df["Close"].rolling(window=50).mean()
+        df["SMA_100"] = df["Close"].rolling(window=100).mean()
         df["SMA_200"] = df["Close"].rolling(window=200).mean()
 
     if "EMA" in filters:
         df["EMA_50"] = df["Close"].ewm(span=50, adjust=False).mean()
+        df["EMA_100"] = df["Close"].ewm(span=100, adjust=False).mean()
         df["EMA_200"] = df["Close"].ewm(span=200, adjust=False).mean()
 
     return df
 
 #===============================================================================================================
-#================================== Affichage
 
 def plot_candlestick_2(symbol, filters):
     """Affiche un graphique en chandeliers avec histogramme de volatilité annuelle et indicateurs techniques sélectionnés."""
@@ -228,12 +251,14 @@ def plot_candlestick_2(symbol, filters):
 
     if "SMA" in filters:
         fig.add_trace(go.Scatter(x=df.index, y=df["SMA_50"], mode="lines", line=dict(color="blue", width=1), name="SMA 50"), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["SMA_100"], mode="lines", line=dict(color="blue", width=1, dash="dot"), name="SMA 100"), row=1, col=1)
         fig.add_trace(go.Scatter(x=df.index, y=df["SMA_200"], mode="lines", line=dict(color="blue", width=1, dash="dot"), name="SMA 200"), row=1, col=1)
-
+        
     if "EMA" in filters:
         fig.add_trace(go.Scatter(x=df.index, y=df["EMA_50"], mode="lines", line=dict(color="purple", width=1), name="EMA 50"), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["EMA_100"], mode="lines", line=dict(color="purple", width=1, dash="dot"), name="EMA 100"), row=1, col=1)
         fig.add_trace(go.Scatter(x=df.index, y=df["EMA_200"], mode="lines", line=dict(color="purple", width=1, dash="dot"), name="EMA 200"), row=1, col=1)
-
+        
     if "MACD" in filters:
         fig.add_trace(go.Scatter(x=df.index, y=df["MACD"], mode="lines", line=dict(color="green", width=1), name="MACD"), row=2, col=1)
         fig.add_trace(go.Scatter(x=df.index, y=df["MACD_Signal"], mode="lines", line=dict(color="red", width=1), name="MACD Signal"), row=2, col=1)
@@ -260,6 +285,68 @@ def plot_candlestick_2(symbol, filters):
     st.plotly_chart(fig) 
     
 #====================================================fin================================================================
+
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
+def load_data(file_path):
+    """Charge les données depuis un fichier CSV et calcule les rendements."""
+    df = pd.read_csv(file_path, index_col=0, parse_dates=True)
+    df['Return'] = df['Close'].pct_change()
+    return df
+def plot_annual_comparison():
+    """Affiche les rendements annuels des actifs (Bitcoin, S&P 500, Or) regroupés par année."""
+    # Chargement des données
+    df_sp500 = load_data("data/SP500.csv")
+    df_btc = load_data("data/BTC.csv")
+    df_gold = load_data("data/GOLD.csv")
+
+    # Resampling des données pour obtenir les rendements annuels
+    df_sp500_annual = df_sp500['Return'].resample('Y').sum()
+    df_btc_annual = df_btc['Return'].resample('Y').sum()
+    df_gold_annual = df_gold['Return'].resample('Y').sum()
+
+    # Création des années de référence
+    years = df_sp500_annual.index.year
+
+    # Préparer les rendements pour l'affichage
+    df_returns = pd.DataFrame({
+        "Year": years,
+        "S&P 500": df_sp500_annual.values,
+        "Bitcoin": df_btc_annual.values,
+        "Gold": df_gold_annual.values
+    })
+
+    # Création du graphique
+    fig = go.Figure()
+
+    # Ajouter les traces pour chaque actif avec des couleurs dynamiques
+    colors = {"S&P 500": "blue", "Bitcoin": "green", "Gold": "gold"}
+    for asset in df_returns.columns[1:]:
+        fig.add_trace(go.Bar(x=df_returns["Year"], y=df_returns[asset], name=asset, marker_color=colors[asset]))
+
+    # Mise en forme du graphique
+    fig.update_layout(
+        title="Rendements Moyen Annuels des Actifs",
+        xaxis_title="Année",
+        yaxis_title="Rendement Annuel",
+        barmode="group",  # Regroupement des barres
+        template="plotly_white",
+        showlegend=True,
+        yaxis=dict(
+            tickmode='array',  # Utiliser un mode d'échelle personnalisé
+            tickvals=[i/1000 for i in range(int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].min().min()*1000), int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].max().max()*1000)+1)],
+            ticktext=[f'{i/1000:.3f}' for i in range(int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].min().min()*1000), int(df_returns[['S&P 500', 'Bitcoin', 'Gold']].max().max()*1000)+1)]
+        )
+    )
+
+    # Affichage avec Streamlit
+    st.plotly_chart(fig)
+
+
+
+
 
 if __name__ == "__main__":
     print("⚠ Ce script est conçu pour être utilisé avec Streamlit.")
