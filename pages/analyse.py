@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pdfkit
 from predictor import plot_forecast
@@ -18,6 +17,14 @@ from visualization import plot_candlestick
 from forex_python.converter import CurrencyRates
 import pdfkit
 from io import BytesIO
+import plotly.io as pio
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from io import BytesIO
+
+
+
 # 🌟 Interface Streamlit
 st.set_page_config(page_title="Analyse Financière", layout="wide")
 actif = st.selectbox("Sélectionnez un actif 🏦", ["BTC", "SP500", "GOLD"])
@@ -139,35 +146,92 @@ st.markdown("Le drawdown représente la perte maximale enregistrée à partir d'
 plot_drawdown(actif)
 
 
-def generate_pdf(content):
-    options = {
-        'page-size': 'A4',
-        'encoding': 'UTF-8',
+
+# 📌 Générer un PDF avec les graphiques et les analyses
+def generate_pdf():
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    y_position = height - 50  # Position initiale
+
+    # Sommaire avec liens interactifs
+    toc = [
+        ("📈 Évolution des prix", "plot_candlestick.png"),
+        ("🎭 Indicateur RSI", "plot_rsi.png"),
+        ("🌊 Bandes de Bollinger", "plot_bollinger.png"),
+        ("📉 MACD", "plot_macd.png"),
+        ("📊 Distribution des Rendements", "plot_return_dist.png"),
+        ("📈 Volatilité Annuelle", "plot_volatility.png"),
+        ("📉 Rendements Quotidiens", "plot_daily_returns.png"),
+        ("🏉 Prédiction des Prix", "plot_forecast.png"),
+        ("🔗 Corrélations entre actifs", "plot_correlation_matrix.png"),
+        ("📉 Drawdown", "plot_drawdown.png"),
+    ]
+
+    # 📌 Génération du sommaire
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, y_position, "📌 Sommaire")
+    y_position -= 30
+    c.setFont("Helvetica", 12)
+
+    for i, (title, img) in enumerate(toc):
+        c.drawString(70, y_position, f"{i+1}. {title}")
+        c.linkURL(f"#{title}", (50, y_position-5, 250, y_position+10))
+        y_position -= 20
+
+    c.showPage()  # Nouvelle page après le sommaire
+    y_position = height - 50
+
+    # 📌 Génération des graphiques et ajout dans le PDF
+    figures = {
+        "plot_candlestick.png": plot_candlestick,
+        "plot_rsi.png": plot_rsi,
+        "plot_bollinger.png": plot_bollinger_bands,
+        "plot_macd.png": plot_macd,
+        "plot_return_dist.png": plot_return_distribution,
+        "plot_volatility.png": plot_volatility,
+        "plot_daily_returns.png": plot_daily_returns,
+        "plot_forecast.png": plot_forecast,
+        "plot_correlation_matrix.png": plot_correlation_matrix,
+        "plot_drawdown.png": plot_drawdown
     }
-    pdf = pdfkit.from_string(content, False, options=options)
-    return pdf
 
-def main():    
-    # Contenu de la page à capturer dans le PDF
-    report_content = """
-    <h1>Analyse Globale 📈</h1>
-    <h2>📈 Evolution des prix des actifs</h2>
-    <p>Ce graphique en chandeliers japonais montre les variations de prix de l'actif sélectionné...</p>
-    <h2>🎭 Indicateur Technique : RSI</h2>
-    <p>L'indice de force relative (RSI) mesure la vitesse et le changement des mouvements de prix...</p>
-    <h2>🌊 Bandes de Bollinger</h2>
-    <p>Les bandes de Bollinger illustrent la volatilité du marché...</p>
-    """
-    
-    # Bouton de téléchargement
-    if st.button("📥 Télécharger le rapport en PDF"):
-        pdf_data = generate_pdf(report_content)
-        st.download_button(
-            label="Cliquez ici pour télécharger",
-            data=pdf_data,
-            file_name="Rapport_Analyse.pdf",
-            mime="application/pdf"
-        )
+    for title, img_name in toc:
+        if img_name in figures:
+            try:
+                fig = figures[img_name]("BTC")  # Modifier selon l'actif sélectionné
+                if fig is not None:
+                    img_buffer = BytesIO()
+                    fig.write_image(img_buffer, format="png")  # Sauvegarde en mémoire
+                    img_buffer.seek(0)
 
-if __name__ == "__main__":
-    main()
+                    c.setFont("Helvetica-Bold", 14)
+                    c.drawString(50, y_position, title)
+                    y_position -= 20
+
+                    img = ImageReader(img_buffer)
+                    c.drawImage(img, 50, y_position - 200, width=500, height=200, preserveAspectRatio=True, anchor='c')
+                    y_position -= 250
+
+                    if y_position < 100:
+                        c.showPage()  # Nouvelle page si besoin
+                        y_position = height - 50
+                else:
+                    print(f"Erreur : Le graphique '{img_name}' est vide ou invalide.")
+            except Exception as e:
+                print(f"Erreur lors de la génération du graphique {title}: {e}")
+
+
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+# 📩 Bouton pour télécharger le PDF
+if st.button("📥 Télécharger le rapport PDF"):
+    pdf_file = generate_pdf()
+    st.download_button(
+        label="📥 Télécharger",
+        data=pdf_file,
+        file_name="Rapport_Analyse.pdf",
+        mime="application/pdf"
+    )
