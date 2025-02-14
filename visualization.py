@@ -257,7 +257,7 @@ def plot_candlestick_2(symbol, filters):
     if "EMA" in filters:
         fig.add_trace(go.Scatter(x=df.index, y=df["EMA_50"], mode="lines", line=dict(color="purple", width=1), name="EMA 50"), row=1, col=1)
         fig.add_trace(go.Scatter(x=df.index, y=df["EMA_100"], mode="lines", line=dict(color="purple", width=1, dash="dot"), name="EMA 100"), row=1, col=1)
-        fig.add_trace(go.Scatter(x=df.index, y=df["EMA_200"], mode="lines", line=dict(color="black", width=1, dash="dot"), name="EMA 200"), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["EMA_200"], mode="lines", line=dict(color="grey", width=1, dash="dot"), name="EMA 200"), row=1, col=1)
         
     if "MACD" in filters:
         fig.add_trace(go.Scatter(x=df.index, y=df["MACD"], mode="lines", line=dict(color="green", width=1), name="MACD"), row=2, col=1)
